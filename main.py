@@ -41,7 +41,30 @@ async def on_member_update(old,new):
     await logs_channel.send("O utilizador " + old.display_name + "alterou o seu nome para " + new.display_name)
     await logs_channel.send(new.display_avatar)
     
-    
+
+# This event is mainly used for logging:
+# A user gets disconnected
+
+@bot.event
+async def on_voice_state_update(member,before,after):
+    if before.channel is not None and after.channel is None:
+        guild = member.guild
+        async for entry in guild.audit_logs(limit=1, action=discord.AuditLogAction.member_disconnect):
+            
+            if entry.user.id != member.id : 
+                kicker = entry.user
+                logs_channel = bot.get_channel(LOGS_CHANNEL_ID)
+                if logs_channel:
+                    await logs_channel.send(f'{kicker.mention} expulsou {member.mention} do canal de voz {before.channel.name}')
+                break
+
+@bot.command()
+async def join(ctx):
+    if(ctx.author.voice):
+        channel = ctx.message.author.voice.channel
+        await channel.connect()
+    else:
+        await ctx.send("I am terribly sorry, but I cannot join you as you are not in a voice channel.")
 
 @bot.command()
 async def add_list(ctx,x):
@@ -56,6 +79,7 @@ async def show_list(ctx):
 async def add(ctx,x,y):
     result = int(x) + int(y)
     await ctx.send(result)
+
 
 
 

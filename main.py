@@ -11,6 +11,16 @@ import json
 
 LOGS_CHANNEL_ID = 1259584910365298719
 
+
+class SimpleView(discord.ui.View):
+
+    @discord.ui.button(label="SHOOOOT",style=discord.ButtonStyle.danger)
+    async def shot(self,interaction:discord.Interaction,button:discord.ui.Button):
+        await interaction.channel.send(interaction.user.mention + " was the fastest!!!")
+        button.disabled=True
+        await interaction.response.edit_message(view=self)
+        self.stop()
+
 #Load the Bot token
 
 #Dont place the directly in the code!!!
@@ -22,7 +32,7 @@ with open("C:/Users/PC/Documents/BinBot/TOKEN.json","r") as file:
 
 list = []
 
-bot = commands.Bot(command_prefix = "!", intents =  discord.Intents.all())
+bot = commands.Bot(command_prefix = "/", intents =  discord.Intents.all())
 
 
 @bot.event
@@ -66,21 +76,15 @@ async def join(ctx):
     else:
         await ctx.send("I am terribly sorry, but I cannot join you as you are not in a voice channel.")
 
-@bot.command()
-async def add_list(ctx,x):
-    list.append(x)
+
+#This command is called to start the minigame duel 
+#The minigame is based on the duel off old cowboys,
+#It will create a separate text room for the two players and past a random time it will send an embed mensage with a button and the first person to click wins
 
 @bot.command()
-async def show_list(ctx):
-    
-    await ctx.send(list)
-
-@bot.command()
-async def add(ctx,x,y):
-    result = int(x) + int(y)
-    await ctx.send(result)
-
-
+async def duel(ctx):
+    view = SimpleView()
+    await ctx.send(view=view)
 
 
 bot.run(BOT_TOKEN)
